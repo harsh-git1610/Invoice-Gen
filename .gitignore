@@ -12,6 +12,7 @@
 
 # testing
 /coverage
+.nyc_output
 
 # next.js
 /.next/
@@ -22,6 +23,8 @@
 
 # misc
 .DS_Store
+.AppleDouble
+.LSOverride
 *.pem
 
 # debug
@@ -31,11 +34,37 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # env files (can opt-in for committing if needed)
-.env*
+.env
+.env.local
+.env.development
+.env.test
+.env.production
 
 # vercel
 .vercel
+.netlify
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Prisma
+/prisma/.env
+/prisma/migrations/
+!/prisma/migrations/.gitkeep
+/lib/generated/prisma
+
+# IDE
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# System Files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
