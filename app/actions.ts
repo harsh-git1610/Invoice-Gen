@@ -42,6 +42,8 @@ export async function createInvoice(prevState: unknown, formData: FormData) {
             toAddress: data.toAddress,
             items: data.items as any, // Prisma Json type workaround
             taxRate: data.taxRate,
+            taxName: data.taxName,
+            discount: data.discount,
             notes: data.notes,
             userId: userId,
             companyLogo: data.companyLogo,

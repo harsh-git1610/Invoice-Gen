@@ -49,7 +49,9 @@ export default function CreateInvoice() {
     ]);
 
     const [notes, setNotes] = useState("");
-    const [taxRate, setTaxRate] = useState(0.1);
+    const [taxRate, setTaxRate] = useState(10); // Default 10%
+    const [taxName, setTaxName] = useState("Tax");
+    const [discount, setDiscount] = useState(0);
 
     // Form validation with Conform
     const [lastResult, action] = useActionState(createInvoice, undefined);
@@ -82,8 +84,10 @@ export default function CreateInvoice() {
     };
 
     const subtotal = items.reduce((acc, item) => acc + item.quantity * item.price, 0);
-    const tax = subtotal * taxRate;
-    const total = subtotal + tax;
+    const discountAmount = subtotal * (discount / 100);
+    const taxableAmount = subtotal - discountAmount;
+    const tax = taxableAmount * (taxRate / 100);
+    const total = taxableAmount + tax;
 
     return (
         <form {...getFormProps(form)} action={action}>
@@ -361,6 +365,77 @@ export default function CreateInvoice() {
                                         </AccordionContent>
                                     </AccordionItem>
 
+                                    {/* Tax & Discount Settings */}
+                                    <AccordionItem value="tax-discount" className="border-b px-6">
+                                        <AccordionTrigger className="hover:no-underline py-6">
+                                            <span className="text-lg font-semibold">Tax & Discount Settings</span>
+                                        </AccordionTrigger>
+                                        <AccordionContent className="pb-6 pt-2">
+                                            <div className="space-y-6">
+                                                {/* Discount Section */}
+                                                <div className="space-y-3">
+                                                    <Label className="text-muted-foreground uppercase text-xs tracking-wider">Discount</Label>
+                                                    <div className="flex items-center gap-2">
+                                                        <Input
+                                                            type="number"
+                                                            name="discount"
+                                                            value={discount}
+                                                            onChange={(e) => setDiscount(Number(e.target.value))}
+                                                            placeholder="0"
+                                                            className="w-32"
+                                                        />
+                                                        <span className="text-sm text-muted-foreground">% Percentage</span>
+                                                    </div>
+                                                </div>
+
+                                                {/* Tax Section */}
+                                                <div className="space-y-3">
+                                                    <Label className="text-muted-foreground uppercase text-xs tracking-wider">Tax Configuration</Label>
+
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                        <div className="space-y-2">
+                                                            <Label>Tax Label</Label>
+                                                            <Input
+                                                                name="taxName"
+                                                                value={taxName}
+                                                                onChange={(e) => setTaxName(e.target.value)}
+                                                                placeholder="e.g. VAT, GST, Sales Tax"
+                                                            />
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                            <Label>Tax Rate (%)</Label>
+                                                            <Input
+                                                                name="taxRate"
+                                                                type="number"
+                                                                value={taxRate}
+                                                                onChange={(e) => setTaxRate(Number(e.target.value))}
+                                                            />
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="pt-2">
+                                                        <Label className="text-xs text-muted-foreground mb-2 block">Quick GST Select</Label>
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {[0, 5, 12, 18, 28].map((rate) => (
+                                                                <Badge
+                                                                    key={rate}
+                                                                    variant={taxRate === rate && (taxName === "GST" || taxName === "IGST") ? "default" : "outline"}
+                                                                    className="cursor-pointer px-4 py-1 hover:bg-primary/10"
+                                                                    onClick={() => {
+                                                                        setTaxRate(rate);
+                                                                        setTaxName("GST");
+                                                                    }}
+                                                                >
+                                                                    GST {rate}%
+                                                                </Badge>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </AccordionContent>
+                                    </AccordionItem>
+
                                     {/* Additional Information */}
                                     <AccordionItem value="additional-info" className="px-6 border-b-0">
                                         <AccordionTrigger className="hover:no-underline py-6">
@@ -395,8 +470,12 @@ export default function CreateInvoice() {
                                         <span className="text-muted-foreground">Subtotal</span>
                                         <span>{currency === "USD" ? "$" : currency === "EUR" ? "€" : "£"}{subtotal.toFixed(2)}</span>
                                     </div>
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-muted-foreground">Tax ({(taxRate * 100).toFixed(0)}%)</span>
+                                    <div className="flex justify-between items-center text-sm">
+                                        <span className="text-muted-foreground">Discount ({discount}%)</span>
+                                        <span>-{currency === "USD" ? "$" : currency === "EUR" ? "€" : "£"}{discountAmount.toFixed(2)}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center text-sm">
+                                        <span className="text-muted-foreground">{taxName} ({taxRate}%)</span>
                                         <span>{currency === "USD" ? "$" : currency === "EUR" ? "€" : "£"}{tax.toFixed(2)}</span>
                                     </div>
                                     <div className="h-px bg-border" />

@@ -44,7 +44,9 @@ export const createInvoiceSchema = z.object({
     items: z.array(invoiceItemSchema).min(1, "At least one item is required"),
 
     // Tax and Notes
-    taxRate: z.number().min(0).max(1, "Tax rate must be between 0 and 100%").default(0.1),
+    taxRate: z.number().min(0, "Tax rate must be at least 0%"),
+    taxName: z.string().min(1, "Tax name is required"),
+    discount: z.number().min(0, "Discount must be at least 0%").max(100, "Discount cannot exceed 100%").default(0),
     notes: z.string().optional(),
 
     // User Relation (for backend)

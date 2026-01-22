@@ -3,7 +3,11 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Button } from "./ui/button";
 import Link from "next/link";
 
-export default function InvoiceActions() {
+interface InvoiceActionsProps {
+    invoiceId: string;
+}
+
+export default function InvoiceActions({ invoiceId }: InvoiceActionsProps) {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -22,7 +26,7 @@ export default function InvoiceActions() {
 
 
                 <DropdownMenuItem asChild>
-                    <Link href="">
+                    <Link href={`/api/invoices/${invoiceId}/pdf`} target="_blank">
                         <DownloadCloudIcon />Download
                     </Link>
 

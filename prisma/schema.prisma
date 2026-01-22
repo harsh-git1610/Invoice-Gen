@@ -53,6 +53,8 @@ model Invoice {
 
   items         Json
   taxRate       Float
+  taxName       String   @default("Tax")
+  discount      Float    @default(0)
   notes         String?
 
   status        InvoiceStatus @default(PENDING)
