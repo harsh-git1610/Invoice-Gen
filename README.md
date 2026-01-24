@@ -1,36 +1,42 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Project Status: Ongoing
 
-## Getting Started
+## Implemented Features
 
-First, run the development server:
+### Authentication
+- Initially implemented **custom authentication**
+- Migrated to **Clerk**
+- Supports **multiple authentication methods**:
+  - Email verification / magic link
+  - Email + password login
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Invoice Generation
+- Created a **draft invoice generation page**
+- Invoice creation flow is functional at a basic level
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+###  User Management
+- Implemented **lazy user creation**
+  - User records are created in the database only when required
+  - Authentication handled by Clerk
+  - User data synced from Clerk to the application database
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## In Progress / Planned Features
+- **Webhooks integration**
+  - Planned flow: Clerk → Webhooks → Database
+  - Will be used to sync user lifecycle events (sign-up, updates, etc.)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **PDF Invoice Templates**
+  - Currently designing and implementing PDF templates for invoices
 
-## Learn More
+## Tech Stack
+- Next.js
+- Clerk (Authentication)
+- Database (TBD / PostgreSQL / MongoDB)
+- PDF Generation (TBD)
 
-To learn more about Next.js, take a look at the following resources:
+## Current Focus
+- Finalizing PDF invoice templates
+- Improving authentication and user data synchronization logic
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Notes
+- This project is under active development.
+- Features and implementation details may change.
