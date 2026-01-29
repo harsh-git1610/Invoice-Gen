@@ -9,36 +9,45 @@ export async function askAI(message: string) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  // 1. DATA FETCHING (The Context)
-  // Fetch a small summary of relevant data to "inject"
-  const [invoiceCount, recentInvoices] = await Promise.all([
+  // 1. DATA FETCHING (Smart Context)
+  const [invoiceCount, recentInvoices, paidStats, pendingStats] = await Promise.all([
+    // Count
     prisma.invoice.count({
-      where: {
-        user: {
-          clerkId: userId,
-        },
-      },
+      where: { user: { clerkId: userId } },
     }),
+    // Recent 5
     prisma.invoice.findMany({
-      where: {
-        user: {
-          clerkId: userId,
-        },
-      },
+      where: { user: { clerkId: userId } },
       take: 5,
       orderBy: { createdAt: 'desc' },
-      select: { invoiceNumber: true, toName: true, total: true, status: true }
+      select: { invoiceNumber: true, toName: true, total: true, status: true, date: true }
+    }),
+    // Total Paid
+    prisma.invoice.aggregate({
+      where: { user: { clerkId: userId }, status: "PAID" },
+      _sum: { total: true }
+    }),
+    // Total Pending
+    prisma.invoice.aggregate({
+      where: { user: { clerkId: userId }, status: "PENDING" },
+      _sum: { total: true }
     })
   ]);
 
   // 2. CONTEXT CONSTRUCTION
-  // Format the data as a string the AI can read
+  const totalPaid = paidStats._sum.total || 0;
+  const totalPending = pendingStats._sum.total || 0;
+
   const contextData = `
-    User Context:
-    - Total Invoices: ${invoiceCount}
-    - Recent Invoices: ${recentInvoices.map(inv =>
-    `#${inv.invoiceNumber} to ${inv.toName} (${inv.total}, ${inv.status})`
-  ).join("; ")}
+    User Financial Context:
+    - Total Invoices Generated: ${invoiceCount}
+    - Total Revenue Collected (PAID): ${totalPaid.toFixed(2)}
+    - Pending Payments (Outstanding): ${totalPending.toFixed(2)}
+    
+    Recent Invoices (Last 5):
+    ${recentInvoices.map(inv =>
+    `- #${inv.invoiceNumber} to ${inv.toName}: ${inv.total} (${inv.status}) on ${inv.date.toISOString().split('T')[0]}`
+  ).join("\n")}
   `;
 
   // 3. PROMPT COMPOSITION
